@@ -242,7 +242,7 @@ eas submit --platform ios   # 확인 필요: 실제 사용 여부
 | 19 | 저장소를 public으로, 중요한 값은 올리지 않기 | Supabase URL/anon key를 `app.json` → `.env` + `app.config.js`로 이동, `.env.example` 추가. 푸시 전이라 첫 커밋을 고쳐 써서 git 이력에도 남지 않게 함 → public 저장소 `MinHyun-code/couple-app` 생성·푸시, 원격 `app.json`에 키 없음 확인 |
 | 20 | 여기어때 잘난체(Jalnan2) 폰트는 저장소에서 빼기 | git 이력 전체에서 폰트 파일 제거 후 강제 푸시(사용자가 직접 실행), `.gitignore`에 추가. 로컬 파일은 유지 |
 | 21 | `expo start` 시 Expo Go "SDK 58로 업그레이드" 오류 | 처음엔 개발용 앱 실행을 안내했으나, 사용자가 항상 아이폰 Expo Go로만 실행해 왔음을 확인 → #22 |
-| 22 | SDK 58로 업그레이드 | `npx expo install expo@^58 --fix` (잠금 파일 재생성), `StyleSheet.absoluteFillObject`(RN 0.88에서 삭제) 7곳 → `absoluteFill`, iOS 번들링 성공 확인. Node 22.13+ 필요 — 사용자가 nvm으로 직접 설치. 아이폰 Expo Go 실기기 확인은 사용자 몫 |
+| 22 | SDK 58로 업그레이드 | `npx expo install expo@^58 --fix` (잠금 파일 재생성), `StyleSheet.absoluteFillObject`(RN 0.88에서 삭제) 7곳 → `absoluteFill`, iOS 번들링 성공 확인. Node 22.13+ 필요 — 사용자가 nvm으로 직접 설치. 사용자가 아이폰 Expo Go에서 실행 확인 (2026-11-01) |
 | 23 | 잠금화면 위젯 "함께한 지 N일째" 뒤에 하트 `ෆ` 추가 | `DdayWidget.swift`의 텍스트를 `"\(entry.days)일째 ෆ"`로 변경 (iOS만, Android 홈 화면 위젯은 그대로). 실기기 확인은 development build 필요 |
 
 ---
