@@ -1,0 +1,13 @@
+# EAS 빌드 업로드 제외 목록 (.easignore가 있으면 EAS는 .gitignore 대신 이 파일을 씀)
+# .gitignore와 같게 유지하되, 빌드에 필요한 Jalnan2 폰트(git 제외)는 업로드되도록 빼지 않는다
+node_modules/
+dist/
+.env
+.env*.local
+.claude/settings.local.json
+
+expo-env.d.ts
+.expo/
+
+/ios/
+/android/

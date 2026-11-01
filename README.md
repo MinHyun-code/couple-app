@@ -75,7 +75,7 @@
 | 기능 | 상태 | 위치 |
 |---|---|---|
 | Android 위젯 (`react-native-android-widget`, headless task) | ✅ 코드 완료 / 실기기 동작 확인 필요 | `widgets/DdayWidget.tsx`, `widget-task-handler.tsx`, `index.js` |
-| iOS **잠금화면** 위젯 (WidgetKit `accessoryRectangular` / `accessoryInline`, App Group `group.com.together.ourdays.widget`) — "함께한 지 / N일째 ෆ" 표시 | ✅ 코드 완료 / 실기기 동작 확인 필요 (Expo Go에서는 안 보임, development build 필요) | `targets/widget/DdayWidget.swift`, `src/lib/widgetSync.tsx` |
+| iOS **잠금화면** 위젯 (WidgetKit `accessoryRectangular` / `accessoryInline`, App Group `group.com.together.ourdays.widget`) — "함께한 지 / N일째 ෆ" 표시 | ✅ 코드 완료 / 실기기 동작 확인 필요 (Expo Go에서는 안 보임, TestFlight 빌드로 확인) | `targets/widget/DdayWidget.swift`, `src/lib/widgetSync.tsx` |
 
 ### 기존 README에 있었으나 현재 상태가 다른 기능
 | 기능 | 상태 | 비고 |
@@ -102,6 +102,7 @@ couple-app/
 ├── app.json                    # Expo 설정 (공개해도 되는 값만)
 ├── app.config.js               # app.json + .env/EAS 환경 변수의 Supabase 설정을 합침
 ├── .env.example                # 필요한 환경 변수 이름 목록 (.env는 git 제외)
+├── .easignore                  # EAS 업로드 제외 목록 (.gitignore와 같되 Jalnan2 폰트는 업로드)
 ├── index.js                    # 앱 진입점: expo-router/entry + Android 위젯 task 등록
 ├── widget-task-handler.tsx     # Android 위젯 headless task (AsyncStorage에서 기념일 읽어 렌더)
 ├── widgets/DdayWidget.tsx      # Android 위젯 UI
@@ -192,26 +193,21 @@ npx expo start --go         # 아이폰 Expo Go로 실행 (평소 방식)
 - **제목 폰트 `Jalnan2`(여기어때 잘난체)는 저장소에 포함하지 않음** (재배포 라이선스 문제로 `.gitignore` 처리). 새로 clone했다면 여기어때 공식 배포처에서 잘난체2 TTF를 받아 정확히 `assets/fonts/Jalnan2TTF.ttf` 이름으로 넣어야 함. 파일이 없으면 `app/_layout.tsx`의 `require`가 실패해 번들링이 안 됨.
 - **평소 실행 방식: Windows PC + 아이폰 Expo Go 앱.** 사용자는 아이폰만 있고 Mac이 없음. `npx expo start --go` 후 아이폰 카메라로 QR을 찍으면 Expo Go로 열림. `expo-dev-client`가 설치돼 있어 그냥 `npx expo start`하면 개발용 앱 모드로 뜨므로 `--go`를 붙이거나 터미널에서 `s`를 눌러 Expo Go 모드로 바꿀 것.
 - **Expo Go는 최신 SDK 하나만 지원** (아이폰은 예전 버전 설치 불가). Expo Go가 새 SDK로 업데이트되면 "Either upgrade this project to SDK XX…" 오류가 나므로 프로젝트도 `npx expo install expo@^XX --fix`로 따라 올려야 함.
-- Expo Go에서는 홈 화면 위젯이 동작하지 않음 (위젯 라이브러리는 네이티브 모듈이 없으면 아무 동작도 안 하는 대체 코드로 넘어가서 앱은 죽지 않음). 위젯까지 테스트하려면 development build 필요:
-```bash
-npm install -g eas-cli
-eas login
-eas device:create                                    # 처음 한 번: 아이폰 Safari로 링크 열어 프로필 설치
-eas build --profile development --platform ios       # 15~30분, Apple ID 로그인 → 인증서는 EAS 자동 관리
-# 빌드 완료 후 나오는 링크/QR을 아이폰으로 열어 설치
-npx expo start --dev-client                          # 개발용 앱에서 PC 서버 선택 (Expo Go는 --go)
-```
-- 설치한 앱이 안 열리면 아이폰 **설정 → 개인정보 보호 및 보안 → 개발자 모드** 켜고 재부팅.
-- 잠금화면 위젯 확인: 잠금화면 길게 누르기 → 사용자화 → 잠금화면 → 위젯에서 "함께한 날" 추가 (앱을 한 번 열어야 날짜가 채워짐).
-- 첫 빌드에서 위젯 App Group 권한이나 비정사각형 아이콘 때문에 실패할 수 있음 (확인 필요).
+- Expo Go에서는 위젯이 동작하지 않음 (위젯 라이브러리는 네이티브 모듈이 없으면 아무 동작도 안 하는 대체 코드로 넘어가서 앱은 죽지 않음). 위젯 등 네이티브 기능은 **TestFlight**로 확인 (4-4).
+- 개발용 앱(development build, `eas device:create` 기기 등록 필요)은 **쓰지 않음** — 사용자는 TestFlight로만 실제 앱을 테스트함.
 
-### 4-4. 빌드 / 배포
+### 4-4. TestFlight 빌드 / 배포 (실제 앱 테스트 방법)
+**처음 한 번**: EAS 환경 변수 등록 (4-2), `npm install -g eas-cli@latest`, `eas login`
 ```bash
-npm run build:ios           # eas build --platform ios (production 프로필)
-npm run build:android       # eas build --platform android
-eas submit --platform ios   # 확인 필요: 실제 사용 여부
+eas build --profile production --platform ios --auto-submit   # 빌드 후 App Store Connect(TestFlight)로 자동 업로드
+# 또는 따로: eas build --profile production --platform ios  →  eas submit --platform ios --latest
 ```
-- iOS 배포에는 Apple Developer 계정($99/년) 필요
+- 기기 등록 필요 없음. 업로드 후 Apple 처리 10~30분 → 아이폰 **TestFlight 앱**에서 설치. 본인(내부 테스터)은 심사 없음.
+- **`.easignore`**: EAS는 이 파일이 있으면 `.gitignore` 대신 사용. `.gitignore`와 같지만 `assets/fonts/Jalnan2TTF.ttf`만 빠져 있어서, git에는 없는 폰트가 빌드 서버로는 업로드됨 (`eas build:inspect --stage archive`로 확인함). **`.gitignore`를 바꾸면 `.easignore`도 같이 수정할 것.**
+- 코드를 바꿀 때마다 새로 빌드·업로드해야 함 (빌드 번호는 `autoIncrement`로 자동 증가).
+- 잠금화면 위젯 확인: 잠금화면 길게 누르기 → 사용자화 → 잠금화면 → 위젯에서 "함께한 날" 추가 (앱을 한 번 열어야 날짜가 채워짐).
+- Apple 쪽 문제로 막힐 수 있음: 계정 잠금(iforgot.apple.com), 개발자 약관 업데이트 미동의(developer.apple.com/account, App Store Connect → 비즈니스에서 동의). EU 판매자(trader) 정보는 EU 배포 시 필요.
+- iOS 배포에는 Apple Developer 계정($99/년) 필요. Android는 `npm run build:android` (현재 사용 안 함)
 - 앱 버전은 EAS 원격 관리(`appVersionSource: remote`, production `autoIncrement`)
 
 ### 4-5. 테스트 / 검사
@@ -248,7 +244,8 @@ eas submit --platform ios   # 확인 필요: 실제 사용 여부
 | 20 | 여기어때 잘난체(Jalnan2) 폰트는 저장소에서 빼기 | git 이력 전체에서 폰트 파일 제거 후 강제 푸시(사용자가 직접 실행), `.gitignore`에 추가. 로컬 파일은 유지 |
 | 21 | `expo start` 시 Expo Go "SDK 58로 업그레이드" 오류 | 처음엔 개발용 앱 실행을 안내했으나, 사용자가 항상 아이폰 Expo Go로만 실행해 왔음을 확인 → #22 |
 | 22 | SDK 58로 업그레이드 | `npx expo install expo@^58 --fix` (잠금 파일 재생성), `StyleSheet.absoluteFillObject`(RN 0.88에서 삭제) 7곳 → `absoluteFill`, iOS 번들링 성공 확인. Node 22.13+ 필요 — 사용자가 nvm으로 직접 설치. 사용자가 아이폰 Expo Go에서 실행 확인 (2026-11-01) |
-| 23 | 잠금화면 위젯 "함께한 지 N일째" 뒤에 하트 `ෆ` 추가 | `DdayWidget.swift`의 텍스트를 `"\(entry.days)일째 ෆ"`로 변경 (iOS만, Android 홈 화면 위젯은 그대로). 실기기 확인은 development build 필요 |
+| 23 | 잠금화면 위젯 "함께한 지 N일째" 뒤에 하트 `ෆ` 추가 | `DdayWidget.swift`의 텍스트를 `"\(entry.days)일째 ෆ"`로 변경 (iOS만, Android 홈 화면 위젯은 그대로). 실기기 확인은 TestFlight 빌드로 |
+| 24 | 개발용 앱으로 빌드해 보기 → TestFlight로 변경 | Apple 계정 잠금·약관 미동의로 막힘 → 해결(사용자). 기기 등록 단계에서 사용자가 TestFlight로만 테스트한다고 알려줌 → 개발용 앱 중단. `.easignore` 추가(폰트 업로드), EAS 환경 변수 등록은 권한 문제로 사용자가 직접 |
 
 ---
 
@@ -266,7 +263,7 @@ eas submit --platform ios   # 확인 필요: 실제 사용 여부
 - **Expo Go → development build 전환**: 위젯 네이티브 타깃 때문에 `expo-dev-client` 추가.
 - **캐릭터 탭 숨김**: 이유 확인 필요.
 - **누락 컬럼은 `IF NOT EXISTS` 마이그레이션으로 보충**: 운영 DB에는 이미 컬럼이 수동으로 추가돼 있을 가능성이 높아서, 새 DB와 기존 DB 모두에서 안전하게 실행되도록 함. 새 DB 기준 정의는 `is_recurring BOOLEAN NOT NULL DEFAULT FALSE`, `icon TEXT`, `date_idea_id UUID → date_ideas(id) ON DELETE SET NULL`(버킷리스트 삭제 시 일정은 남김).
-- **SDK 58 업그레이드 (개발용 앱 대신 Expo Go 유지)**: 사용자는 Windows + 아이폰 환경이라 Mac 없이 쓸 수 있는 Expo Go가 기본 실행 수단. 아이폰 Expo Go가 SDK 58만 지원하게 돼서, EAS 개발용 앱 빌드보다 SDK를 따라 올리는 쪽을 택함. 위젯은 필요할 때 development build로 따로 테스트.
+- **SDK 58 업그레이드 (개발용 앱 대신 Expo Go 유지)**: 사용자는 Windows + 아이폰 환경이라 Mac 없이 쓸 수 있는 Expo Go가 기본 실행 수단. 아이폰 Expo Go가 SDK 58만 지원하게 돼서, EAS 개발용 앱 빌드보다 SDK를 따라 올리는 쪽을 택함. 위젯 등 네이티브 기능은 TestFlight 빌드로 테스트 (사용자는 개발용 앱을 쓰지 않음).
 - **기본 브랜치는 `main`**: GitHub 기본값과 맞추기 위함. 커밋이 없을 때 `master`에서 이름만 바꿈.
 - **GitHub 저장소는 public, Supabase 설정 값은 env로 분리**: 사용자가 public을 원함. Supabase URL/anon key만 `.env`(로컬)·EAS 환경 변수(빌드)로 옮김. EAS projectId·Apple Team ID는 빌드된 앱에 어차피 들어가는 공개 식별자이고, env로 옮기면 EAS CLI가 프로젝트를 못 찾는 등 빌드 설정이 복잡해져서 `app.json`에 남김.
 - **`.claude/settings.local.json`은 git에서 제외, `.claude/settings.json`은 커밋 대상**: 개인 권한 설정과 프로젝트 공용 설정을 분리.
@@ -304,14 +301,13 @@ eas submit --platform ios   # 확인 필요: 실제 사용 여부
 10. **진입 불가 화면**: `CharacterScreen`(탭 숨김), `MediaPlayerScreen`(라우트는 있으나 이동 코드 없음). 캐릭터 아이템 이미지(`items/*.png`)도 없음.
 11. **`002b_messages_read_at.sql`**: 최신 `002`와 함께 실행하면 `messages_update_read` 정책이 중복되어 에러.
 12. **원격 저장소**: GitHub `MinHyun-code/couple-app` (public) — https://github.com/MinHyun-code/couple-app , 기본 브랜치 `main`, 2026-11-01 첫 푸시. 소스·DB 스키마가 공개돼 있으므로 RLS 허점(6번)이 더 쉽게 드러남. GitHub CLI는 `C:\Program Files\GitHub CLI\gh.exe`에 설치됨 (기존에 열려 있던 터미널에서는 PATH에 없을 수 있음).
-13. **Jalnan2 폰트는 저장소에 없음**: 공개 저장소·git 이력에서 제거함 (Pretendard·D2Coding은 SIL OFL이라 그대로 둠). clone한 환경·EAS 클라우드 빌드에서는 이 파일이 없으므로, 클라우드 빌드 전에 대책 필요 (다음에 할 일 참고). 이력 정리 때문에 2026-11-01에 `main`을 한 번 강제 푸시함. 예전 커밋(`9a7043e`)은 SHA로 직접 조회하면 GitHub 캐시에 아직 남아 있음(폰트만 포함, 키 없음) — 완전히 지우려면 저장소 삭제 후 재생성.
+13. **Jalnan2 폰트는 저장소에 없음**: 공개 저장소·git 이력에서 제거함 (Pretendard·D2Coding은 SIL OFL이라 그대로 둠). clone한 환경에서는 이 파일이 없으므로 직접 받아 넣어야 함. EAS 빌드에는 `.easignore`로 업로드됨 (단, 이 PC처럼 로컬에 파일이 있을 때만). 이력 정리 때문에 2026-11-01에 `main`을 한 번 강제 푸시함. 예전 커밋(`9a7043e`)은 SHA로 직접 조회하면 GitHub 캐시에 아직 남아 있음(폰트만 포함, 키 없음) — 완전히 지우려면 저장소 삭제 후 재생성.
 14. **Expo Go SDK 따라가기**: 아이폰 Expo Go가 SDK 59로 올라가면 다시 같은 오류가 남 → 그때마다 SDK 업그레이드 필요.
 15. **앱 아이콘이 정사각형이 아님**: `src/assets/icon.png`, `src/assets/adaptive-icon.png`가 852x1846이라 `npx expo-doctor`에서 경고. 스토어 제출 전 1024x1024 정사각형으로 교체 필요.
 16. **`npm audit` 취약점 경고**: 설치 시 29건(critical 1) 보고됨. 대부분 개발 도구 의존성으로 추정, `npm audit fix --force`는 Expo 버전을 깨뜨릴 수 있어 실행하지 않음 (확인 필요).
 
 ### 다음에 할 일 (우선순위 순)
-1. EAS 클라우드 빌드 전에 `SUPABASE_URL`, `SUPABASE_ANON_KEY`를 EAS 환경 변수로 등록 (4-2 참고) — 안 하면 빌드된 앱이 Supabase에 연결되지 않음
-   - 같은 이유로 Jalnan2 폰트도 빌드 서버에 없음 → `.easignore`를 만들어 EAS 업로드에만 폰트를 포함시키는 방법 등 대책 필요 (`.easignore`가 있으면 EAS는 `.gitignore` 대신 그 파일을 씀)
+1. EAS production 환경에 `SUPABASE_URL`, `SUPABASE_ANON_KEY` 등록 (4-2 참고) → TestFlight 빌드로 잠금화면 위젯(하트 포함) 확인 — 환경 변수 없이 빌드하면 앱이 켜지자마자 종료됨
 2. RLS 보강 (pending 커플 조회는 초대 코드 RPC로 대체, event_media insert 시 커플 확인 등) — 저장소가 public이 되어 우선순위 올림
 3. 운영 DB에서 `009` 실행 여부와 기존 컬럼 정의 확인 (Supabase Table Editor에서 `calendar_events` 컬럼 확인)
 4. Storage 버킷/정책을 SQL로 문서화
