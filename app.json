@@ -1,0 +1,98 @@
+{
+  "expo": {
+    "name": "우리의 날",
+    "slug": "couple-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./src/assets/icon.png",
+    "scheme": "coupleapp",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.together.ourdays",
+      "buildNumber": "1",
+      "appleTeamId": "D8LRKJGA7Z",
+      "entitlements": {
+        "com.apple.security.application-groups": ["group.com.together.ourdays.widget"]
+      },
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./src/assets/adaptive-icon.png",
+        "backgroundColor": "#FF6B9D"
+      },
+      "package": "com.together.ourdays",
+      "versionCode": 1
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./src/assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "./assets/fonts/PretendardVariable.ttf"
+          ]
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "color": "#FF6B9D"
+        }
+      ],
+      "expo-image",
+      "expo-status-bar",
+      "expo-web-browser",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./src/assets/splash.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#FBF3EE"
+        }
+      ],
+      "expo-dev-client",
+      "@bacons/apple-targets",
+      [
+        "react-native-android-widget",
+        {
+          "widgets": [
+            {
+              "name": "DdayWidget",
+              "label": "함께한 날",
+              "description": "함께한 지 며칠째인지 보여줘요",
+              "minWidth": "110dp",
+              "minHeight": "110dp",
+              "targetCellWidth": 2,
+              "targetCellHeight": 2,
+              "updatePeriodMillis": 3600000
+            }
+          ]
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "f109d698-391d-4a01-a310-60817063d44c"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/f109d698-391d-4a01-a310-60817063d44c"
+    }
+  }
+}
