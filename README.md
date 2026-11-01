@@ -234,7 +234,7 @@ eas submit --platform ios   # 확인 필요: 실제 사용 여부
 | 16 | 앞으로 기능 추가/제거/변경 시 README도 같이 수정 | 작업 규칙으로 등록 (7번 컨벤션 참고) |
 | 17 | `.gitignore` 보강 + 누락 컬럼 마이그레이션 | `.gitignore`에 `node_modules/`, `dist/`, `.env`, `.env*.local`, `.claude/settings.local.json` 추가 / `009_calendar_recurring_icon_idea.sql` 작성 |
 | 18 | 기본 브랜치 정하기 → 첫 커밋 → 원격 연결 | `master` → `main`으로 변경, 첫 커밋 완료. GitHub CLI 설치·로그인 |
-| 19 | 저장소를 public으로, 중요한 값은 올리지 않기 | Supabase URL/anon key를 `app.json` → `.env` + `app.config.js`로 이동, `.env.example` 추가. 푸시 전이라 첫 커밋을 고쳐 써서 git 이력에도 남지 않게 함 |
+| 19 | 저장소를 public으로, 중요한 값은 올리지 않기 | Supabase URL/anon key를 `app.json` → `.env` + `app.config.js`로 이동, `.env.example` 추가. 푸시 전이라 첫 커밋을 고쳐 써서 git 이력에도 남지 않게 함 → public 저장소 `MinHyun-code/couple-app` 생성·푸시, 원격 `app.json`에 키 없음 확인 |
 
 ---
 
@@ -288,15 +288,14 @@ eas submit --platform ios   # 확인 필요: 실제 사용 여부
 9. **잘못 생성된 폴더**: 루트의 `{supabase/migrations,src}` 디렉터리 (중괄호 확장이 안 된 mkdir 흔적, 비어 있음) — 삭제해도 됨.
 10. **진입 불가 화면**: `CharacterScreen`(탭 숨김), `MediaPlayerScreen`(라우트는 있으나 이동 코드 없음). 캐릭터 아이템 이미지(`items/*.png`)도 없음.
 11. **`002b_messages_read_at.sql`**: 최신 `002`와 함께 실행하면 `messages_update_read` 정책이 중복되어 에러.
-12. **원격 저장소**: GitHub `MinHyun-code/couple-app` (public) — 생성·푸시는 사용자 최종 확인 후 진행. GitHub CLI는 `C:\Program Files\GitHub CLI\gh.exe`에 설치됨 (기존에 열려 있던 터미널에서는 PATH에 없을 수 있음).
+12. **원격 저장소**: GitHub `MinHyun-code/couple-app` (public) — https://github.com/MinHyun-code/couple-app , 기본 브랜치 `main`, 2026-11-01 첫 푸시. 소스·DB 스키마가 공개돼 있으므로 RLS 허점(6번)이 더 쉽게 드러남. GitHub CLI는 `C:\Program Files\GitHub CLI\gh.exe`에 설치됨 (기존에 열려 있던 터미널에서는 PATH에 없을 수 있음).
 13. **폰트 재배포 라이선스**: 공개 저장소에 `assets/fonts/`의 폰트 파일(Pretendard, Jalnan2, D2Coding)이 그대로 올라감. Pretendard·D2Coding은 SIL OFL이라 재배포 가능, Jalnan2(여기어때 잘난체)는 폰트 파일 재배포 허용 여부 확인 필요.
 
 ### 다음에 할 일 (우선순위 순)
-1. GitHub public 저장소 생성 후 `git push -u origin main`
-1-1. EAS 클라우드 빌드 전에 `SUPABASE_URL`, `SUPABASE_ANON_KEY`를 EAS 환경 변수로 등록 (4-2 참고) — 안 하면 빌드된 앱이 Supabase에 연결되지 않음
-2. 운영 DB에서 `009` 실행 여부와 기존 컬럼 정의 확인 (Supabase Table Editor에서 `calendar_events` 컬럼 확인)
-3. Storage 버킷/정책을 SQL로 문서화
-4. RLS 보강 (pending 커플 조회는 초대 코드 RPC로 대체, event_media insert 시 커플 확인 등)
+1. EAS 클라우드 빌드 전에 `SUPABASE_URL`, `SUPABASE_ANON_KEY`를 EAS 환경 변수로 등록 (4-2 참고) — 안 하면 빌드된 앱이 Supabase에 연결되지 않음
+2. RLS 보강 (pending 커플 조회는 초대 코드 RPC로 대체, event_media insert 시 커플 확인 등) — 저장소가 public이 되어 우선순위 올림
+3. 운영 DB에서 `009` 실행 여부와 기존 컬럼 정의 확인 (Supabase Table Editor에서 `calendar_events` 컬럼 확인)
+4. Storage 버킷/정책을 SQL로 문서화
 5. `npx tsc --noEmit` 에러 정리 (`absoluteFillObject` → `absoluteFill` 등)
 6. iOS/Android 위젯 실기기 동작 확인
 7. 캐릭터·일정별 영상 공유 기능: 살릴지 제거할지 결정 후 정리, 미사용 패키지 제거
