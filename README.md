@@ -75,7 +75,7 @@
 | 기능 | 상태 | 위치 |
 |---|---|---|
 | Android 위젯 (`react-native-android-widget`, headless task) | ✅ 코드 완료 / 실기기 동작 확인 필요 | `widgets/DdayWidget.tsx`, `widget-task-handler.tsx`, `index.js` |
-| iOS 위젯 (WidgetKit + App Group `group.com.together.ourdays.widget`) | ✅ 코드 완료 / 실기기 동작 확인 필요 | `targets/widget/`, `src/lib/widgetSync.tsx` |
+| iOS **잠금화면** 위젯 (WidgetKit `accessoryRectangular` / `accessoryInline`, App Group `group.com.together.ourdays.widget`) — "함께한 지 / N일째 ෆ" 표시 | ✅ 코드 완료 / 실기기 동작 확인 필요 (Expo Go에서는 안 보임, development build 필요) | `targets/widget/DdayWidget.swift`, `src/lib/widgetSync.tsx` |
 
 ### 기존 README에 있었으나 현재 상태가 다른 기능
 | 기능 | 상태 | 비고 |
@@ -243,6 +243,7 @@ eas submit --platform ios   # 확인 필요: 실제 사용 여부
 | 20 | 여기어때 잘난체(Jalnan2) 폰트는 저장소에서 빼기 | git 이력 전체에서 폰트 파일 제거 후 강제 푸시(사용자가 직접 실행), `.gitignore`에 추가. 로컬 파일은 유지 |
 | 21 | `expo start` 시 Expo Go "SDK 58로 업그레이드" 오류 | 처음엔 개발용 앱 실행을 안내했으나, 사용자가 항상 아이폰 Expo Go로만 실행해 왔음을 확인 → #22 |
 | 22 | SDK 58로 업그레이드 | `npx expo install expo@^58 --fix` (잠금 파일 재생성), `StyleSheet.absoluteFillObject`(RN 0.88에서 삭제) 7곳 → `absoluteFill`, iOS 번들링 성공 확인. Node 22.13+ 필요 — 사용자가 nvm으로 직접 설치. 아이폰 Expo Go 실기기 확인은 사용자 몫 |
+| 23 | 잠금화면 위젯 "함께한 지 N일째" 뒤에 하트 `ෆ` 추가 | `DdayWidget.swift`의 텍스트를 `"\(entry.days)일째 ෆ"`로 변경 (iOS만, Android 홈 화면 위젯은 그대로). 실기기 확인은 development build 필요 |
 
 ---
 

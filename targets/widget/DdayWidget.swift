@@ -58,7 +58,7 @@ struct DdayWidgetView: View {
         VStack(spacing: 2) {
             Text("함께한 지")
                 .font(.caption2)
-            Text("\(entry.days)일째")
+            Text("\(entry.days)일째 ෆ")
                 .font(.headline)
         }
     }
