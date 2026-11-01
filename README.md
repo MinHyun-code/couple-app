@@ -136,7 +136,7 @@ couple-app/
 │   ├── types/index.ts          # DB 대응 타입
 │   ├── theme.ts                # 폰트 상수, 테마 색상
 │   └── assets/                 # 앱 아이콘, 스플래시
-├── assets/fonts/               # Pretendard, Jalnan2, D2Coding(미사용)
+├── assets/fonts/               # Pretendard, D2Coding(미사용), Jalnan2(로컬에만 있음 — git 제외)
 └── supabase/migrations/        # SQL Editor에 순서대로 수동 실행하는 스키마 파일
 ```
 
@@ -184,9 +184,11 @@ eas env:create --name SUPABASE_ANON_KEY --environment production --visibility se
 ```bash
 npm install
 cp .env.example .env        # 그다음 .env에 SUPABASE_URL, SUPABASE_ANON_KEY 값 입력
+# 여기어때 잘난체 폰트를 직접 받아서 assets/fonts/Jalnan2TTF.ttf 로 저장 (저장소에 없음, 아래 참고)
 npx expo install --fix      # Expo SDK와 패키지 버전 맞추기
 npx expo start              # = npm start
 ```
+- **제목 폰트 `Jalnan2`(여기어때 잘난체)는 저장소에 포함하지 않음** (재배포 라이선스 문제로 `.gitignore` 처리). 새로 clone했다면 여기어때 공식 배포처에서 잘난체2 TTF를 받아 정확히 `assets/fonts/Jalnan2TTF.ttf` 이름으로 넣어야 함. 파일이 없으면 `app/_layout.tsx`의 `require`가 실패해 번들링이 안 됨.
 - 위젯(`@bacons/apple-targets`, `react-native-android-widget`)과 `expo-dev-client`가 들어 있어 **Expo Go로는 전체 기능이 동작하지 않음** → development build 필요:
 ```bash
 npm install -g eas-cli
@@ -235,6 +237,7 @@ eas submit --platform ios   # 확인 필요: 실제 사용 여부
 | 17 | `.gitignore` 보강 + 누락 컬럼 마이그레이션 | `.gitignore`에 `node_modules/`, `dist/`, `.env`, `.env*.local`, `.claude/settings.local.json` 추가 / `009_calendar_recurring_icon_idea.sql` 작성 |
 | 18 | 기본 브랜치 정하기 → 첫 커밋 → 원격 연결 | `master` → `main`으로 변경, 첫 커밋 완료. GitHub CLI 설치·로그인 |
 | 19 | 저장소를 public으로, 중요한 값은 올리지 않기 | Supabase URL/anon key를 `app.json` → `.env` + `app.config.js`로 이동, `.env.example` 추가. 푸시 전이라 첫 커밋을 고쳐 써서 git 이력에도 남지 않게 함 → public 저장소 `MinHyun-code/couple-app` 생성·푸시, 원격 `app.json`에 키 없음 확인 |
+| 20 | 여기어때 잘난체(Jalnan2) 폰트는 저장소에서 빼기 | git 이력 전체에서 폰트 파일 제거 후 강제 푸시, `.gitignore`에 추가. 로컬 파일은 유지 |
 
 ---
 
@@ -289,10 +292,11 @@ eas submit --platform ios   # 확인 필요: 실제 사용 여부
 10. **진입 불가 화면**: `CharacterScreen`(탭 숨김), `MediaPlayerScreen`(라우트는 있으나 이동 코드 없음). 캐릭터 아이템 이미지(`items/*.png`)도 없음.
 11. **`002b_messages_read_at.sql`**: 최신 `002`와 함께 실행하면 `messages_update_read` 정책이 중복되어 에러.
 12. **원격 저장소**: GitHub `MinHyun-code/couple-app` (public) — https://github.com/MinHyun-code/couple-app , 기본 브랜치 `main`, 2026-11-01 첫 푸시. 소스·DB 스키마가 공개돼 있으므로 RLS 허점(6번)이 더 쉽게 드러남. GitHub CLI는 `C:\Program Files\GitHub CLI\gh.exe`에 설치됨 (기존에 열려 있던 터미널에서는 PATH에 없을 수 있음).
-13. **폰트 재배포 라이선스**: 공개 저장소에 `assets/fonts/`의 폰트 파일(Pretendard, Jalnan2, D2Coding)이 그대로 올라감. Pretendard·D2Coding은 SIL OFL이라 재배포 가능, Jalnan2(여기어때 잘난체)는 폰트 파일 재배포 허용 여부 확인 필요.
+13. **Jalnan2 폰트는 저장소에 없음**: 공개 저장소·git 이력에서 제거함 (Pretendard·D2Coding은 SIL OFL이라 그대로 둠). clone한 환경·EAS 클라우드 빌드에서는 이 파일이 없으므로, 클라우드 빌드 전에 대책 필요 (다음에 할 일 참고). 이력 정리 때문에 2026-11-01에 `main`을 한 번 강제 푸시함.
 
 ### 다음에 할 일 (우선순위 순)
 1. EAS 클라우드 빌드 전에 `SUPABASE_URL`, `SUPABASE_ANON_KEY`를 EAS 환경 변수로 등록 (4-2 참고) — 안 하면 빌드된 앱이 Supabase에 연결되지 않음
+   - 같은 이유로 Jalnan2 폰트도 빌드 서버에 없음 → `.easignore`를 만들어 EAS 업로드에만 폰트를 포함시키는 방법 등 대책 필요 (`.easignore`가 있으면 EAS는 `.gitignore` 대신 그 파일을 씀)
 2. RLS 보강 (pending 커플 조회는 초대 코드 RPC로 대체, event_media insert 시 커플 확인 등) — 저장소가 public이 되어 우선순위 올림
 3. 운영 DB에서 `009` 실행 여부와 기존 컬럼 정의 확인 (Supabase Table Editor에서 `calendar_events` 컬럼 확인)
 4. Storage 버킷/정책을 SQL로 문서화
@@ -303,7 +307,6 @@ eas submit --platform ios   # 확인 필요: 실제 사용 여부
 
 ### 확인 필요 항목
 - 이전 세션에서의 실제 요청 내용·순서·사용자 지적 사항(코딩 규칙 등) — 기록 없음
-- Jalnan2(여기어때 잘난체) 폰트 파일을 공개 저장소에 올려도 되는지 (라이선스)
 - 운영 DB의 `is_recurring` / `icon` / `date_idea_id` 컬럼 정의가 `009`와 같은지, `009`를 실행했는지
 - `avatars` / `event-images` 버킷의 public 여부와 업로드 정책
 - 캐릭터 탭을 숨긴 이유와 향후 계획 (❌ 취소인지 ⏳ 보류인지)
