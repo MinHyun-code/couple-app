@@ -348,7 +348,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
 
-  overlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.35)', zIndex: 30 },
+  overlay: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(0,0,0,0.35)', zIndex: 30 },
   sheet: {
     position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 30,
     backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24,

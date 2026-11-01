@@ -77,7 +77,7 @@ const slideStyles = StyleSheet.create({
   slide: { width: SCREEN_W, height: CAROUSEL_H },
   image: { width: '100%', height: '100%' },
   loader: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: '#f5f5f5',
     alignItems: 'center', justifyContent: 'center',
   },

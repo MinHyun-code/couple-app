@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
   avatarImg: { width: 110, height: 110, borderRadius: 55, borderWidth: 3 },
   avatarPlaceholder: { width: 110, height: 110, borderRadius: 55, borderWidth: 3, alignItems: 'center', justifyContent: 'center' },
   avatarInitials: { fontFamily: FONT_HEADING, fontSize: 44, fontWeight: '700' },
-  avatarOverlay: { ...StyleSheet.absoluteFillObject, borderRadius: 55, backgroundColor: 'rgba(0,0,0,0.4)', alignItems: 'center', justifyContent: 'center' },
+  avatarOverlay: { ...StyleSheet.absoluteFill, borderRadius: 55, backgroundColor: 'rgba(0,0,0,0.4)', alignItems: 'center', justifyContent: 'center' },
   editBadge: { position: 'absolute', bottom: 2, right: 2, width: 30, height: 30, borderRadius: 15, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: '#fff' },
   editBadgeText: { color: '#fff', fontSize: 13 },
   photoHint: { fontFamily: FONT_HEADING, fontSize: 17, color: '#bbb', marginTop: -20 },

@@ -341,7 +341,7 @@ export default function ChatScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   bg: { flex: 1 },
-  bgOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.08)' },
+  bgOverlay: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(0,0,0,0.08)' },
 
   loadingWrap: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   loadingMoreWrap: { paddingVertical: 12, alignItems: 'center' },

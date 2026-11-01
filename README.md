@@ -89,10 +89,10 @@
 
 ### 스택
 - **언어**: TypeScript (`typescript ~6.0.3`), Swift (iOS 위젯)
-- **프레임워크**: Expo SDK 57 (`expo ^57.0.0`), React Native `0.86.3`, React `19.2.3`, Expo Router `~57.0.21` (typed routes 사용)
+- **프레임워크**: Expo SDK 58 (`expo ^58.0.0`), React Native `0.88.1`, React `19.3.0`, Expo Router `~58.0.29` (typed routes 사용) — 2026-11-01 SDK 57 → 58 업그레이드
 - **백엔드**: Supabase (`@supabase/supabase-js` — Auth, Postgres + RLS, Realtime, Storage)
 - **상태관리**: `zustand` (+ `persist` 미들웨어로 AsyncStorage 저장)
-- **주요 라이브러리**: `date-fns`(ko 로케일), `expo-image`, `expo-image-picker`, `expo-image-manipulator`, `expo-notifications`, `expo-clipboard`, `react-native-reanimated` 4 + `react-native-worklets`, `react-native-gesture-handler`, `react-native-svg`, `react-native-zoom-toolkit`(지도 확대), `react-native-webview`(릴스), `react-native-youtube-iframe`, `react-native-android-widget`, `@bacons/apple-targets`(iOS 위젯 타깃)
+- **주요 라이브러리**: `date-fns`(ko 로케일), `expo-image`, `expo-image-picker`, `expo-image-manipulator`, `expo-notifications`, `expo-clipboard`, `react-native-reanimated` 4.7 + `react-native-worklets` 0.13, `react-native-gesture-handler` 3 (기존 `Gesture.*` + `GestureDetector` 방식 그대로 사용 — v3에서도 지원), `react-native-svg`, `react-native-zoom-toolkit`(지도 확대), `react-native-webview`(릴스), `react-native-youtube-iframe`, `react-native-android-widget`, `@bacons/apple-targets`(iOS 위젯 타깃)
 - **폰트**: Pretendard(`FONT`, 본문), 여기어때 잘난체 `Jalnan2`(`FONT_HEADING`, 제목) — `assets/fonts/`
 - **빌드**: EAS Build (`eas.json`: `development`(dev client) / `preview` / `production`), EAS Update (`runtimeVersion.policy = appVersion`)
 
@@ -181,16 +181,18 @@ eas env:create --name SUPABASE_ANON_KEY --environment production --visibility se
 ```
 
 ### 4-3. 설치 & 실행
+**필요: Node.js 22.13 이상** (Expo SDK 58 요구사항. 이 PC는 nvm-windows 사용 — `nvm install 22.23.4` → `nvm use 22.23.4`, 관리자 권한 터미널이 필요할 수 있음)
 ```bash
 npm install
 cp .env.example .env        # 그다음 .env에 SUPABASE_URL, SUPABASE_ANON_KEY 값 입력
 # 여기어때 잘난체 폰트를 직접 받아서 assets/fonts/Jalnan2TTF.ttf 로 저장 (저장소에 없음, 아래 참고)
 npx expo install --fix      # Expo SDK와 패키지 버전 맞추기
-npx expo start              # = npm start
+npx expo start --go         # 아이폰 Expo Go로 실행 (평소 방식)
 ```
 - **제목 폰트 `Jalnan2`(여기어때 잘난체)는 저장소에 포함하지 않음** (재배포 라이선스 문제로 `.gitignore` 처리). 새로 clone했다면 여기어때 공식 배포처에서 잘난체2 TTF를 받아 정확히 `assets/fonts/Jalnan2TTF.ttf` 이름으로 넣어야 함. 파일이 없으면 `app/_layout.tsx`의 `require`가 실패해 번들링이 안 됨.
-- **평소 실행은 `npx expo start --dev-client`** 후 아이폰 기본 카메라로 QR을 찍거나, 폰에 설치된 개발용 "우리의 날" 앱에서 서버 선택. **Expo Go 앱으로는 열 수 없음** — 아이폰 Expo Go는 최신 SDK(58)만 지원하고 이 프로젝트는 SDK 57이라 "Either upgrade this project to SDK 58.0.0…" 오류가 남.
-- 위젯(`@bacons/apple-targets`, `react-native-android-widget`)과 `expo-dev-client`가 들어 있어 **Expo Go로는 전체 기능이 동작하지 않음** → development build 필요 (네이티브 패키지가 바뀌었을 때도 다시 빌드):
+- **평소 실행 방식: Windows PC + 아이폰 Expo Go 앱.** 사용자는 아이폰만 있고 Mac이 없음. `npx expo start --go` 후 아이폰 카메라로 QR을 찍으면 Expo Go로 열림. `expo-dev-client`가 설치돼 있어 그냥 `npx expo start`하면 개발용 앱 모드로 뜨므로 `--go`를 붙이거나 터미널에서 `s`를 눌러 Expo Go 모드로 바꿀 것.
+- **Expo Go는 최신 SDK 하나만 지원** (아이폰은 예전 버전 설치 불가). Expo Go가 새 SDK로 업데이트되면 "Either upgrade this project to SDK XX…" 오류가 나므로 프로젝트도 `npx expo install expo@^XX --fix`로 따라 올려야 함.
+- Expo Go에서는 홈 화면 위젯이 동작하지 않음 (위젯 라이브러리는 네이티브 모듈이 없으면 아무 동작도 안 하는 대체 코드로 넘어가서 앱은 죽지 않음). 위젯까지 테스트하려면 development build 필요:
 ```bash
 npm install -g eas-cli
 eas login
@@ -239,7 +241,8 @@ eas submit --platform ios   # 확인 필요: 실제 사용 여부
 | 18 | 기본 브랜치 정하기 → 첫 커밋 → 원격 연결 | `master` → `main`으로 변경, 첫 커밋 완료. GitHub CLI 설치·로그인 |
 | 19 | 저장소를 public으로, 중요한 값은 올리지 않기 | Supabase URL/anon key를 `app.json` → `.env` + `app.config.js`로 이동, `.env.example` 추가. 푸시 전이라 첫 커밋을 고쳐 써서 git 이력에도 남지 않게 함 → public 저장소 `MinHyun-code/couple-app` 생성·푸시, 원격 `app.json`에 키 없음 확인 |
 | 20 | 여기어때 잘난체(Jalnan2) 폰트는 저장소에서 빼기 | git 이력 전체에서 폰트 파일 제거 후 강제 푸시(사용자가 직접 실행), `.gitignore`에 추가. 로컬 파일은 유지 |
-| 21 | `expo start` 시 Expo Go "SDK 58로 업그레이드" 오류 | 업그레이드 대신 기존 개발용 앱으로 `npx expo start --dev-client` 실행하기로 함 |
+| 21 | `expo start` 시 Expo Go "SDK 58로 업그레이드" 오류 | 처음엔 개발용 앱 실행을 안내했으나, 사용자가 항상 아이폰 Expo Go로만 실행해 왔음을 확인 → #22 |
+| 22 | SDK 58로 업그레이드 | `npx expo install expo@^58 --fix` (잠금 파일 재생성), `StyleSheet.absoluteFillObject`(RN 0.88에서 삭제) 7곳 → `absoluteFill`, iOS 번들링 성공 확인. Node 22.13+ 필요 — 사용자가 nvm으로 직접 설치. 아이폰 Expo Go 실기기 확인은 사용자 몫 |
 
 ---
 
@@ -257,6 +260,7 @@ eas submit --platform ios   # 확인 필요: 실제 사용 여부
 - **Expo Go → development build 전환**: 위젯 네이티브 타깃 때문에 `expo-dev-client` 추가.
 - **캐릭터 탭 숨김**: 이유 확인 필요.
 - **누락 컬럼은 `IF NOT EXISTS` 마이그레이션으로 보충**: 운영 DB에는 이미 컬럼이 수동으로 추가돼 있을 가능성이 높아서, 새 DB와 기존 DB 모두에서 안전하게 실행되도록 함. 새 DB 기준 정의는 `is_recurring BOOLEAN NOT NULL DEFAULT FALSE`, `icon TEXT`, `date_idea_id UUID → date_ideas(id) ON DELETE SET NULL`(버킷리스트 삭제 시 일정은 남김).
+- **SDK 58 업그레이드 (개발용 앱 대신 Expo Go 유지)**: 사용자는 Windows + 아이폰 환경이라 Mac 없이 쓸 수 있는 Expo Go가 기본 실행 수단. 아이폰 Expo Go가 SDK 58만 지원하게 돼서, EAS 개발용 앱 빌드보다 SDK를 따라 올리는 쪽을 택함. 위젯은 필요할 때 development build로 따로 테스트.
 - **기본 브랜치는 `main`**: GitHub 기본값과 맞추기 위함. 커밋이 없을 때 `master`에서 이름만 바꿈.
 - **GitHub 저장소는 public, Supabase 설정 값은 env로 분리**: 사용자가 public을 원함. Supabase URL/anon key만 `.env`(로컬)·EAS 환경 변수(빌드)로 옮김. EAS projectId·Apple Team ID는 빌드된 앱에 어차피 들어가는 공개 식별자이고, env로 옮기면 EAS CLI가 프로젝트를 못 찾는 등 빌드 설정이 복잡해져서 `app.json`에 남김.
 - **`.claude/settings.local.json`은 git에서 제외, `.claude/settings.json`은 커밋 대상**: 개인 권한 설정과 프로젝트 공용 설정을 분리.
@@ -281,7 +285,7 @@ eas submit --platform ios   # 확인 필요: 실제 사용 여부
 2. **Storage 버킷 설정이 코드/SQL에 없음**: `avatars`, `event-images` 버킷과 정책은 대시보드에서 수동 설정.
 3. **줄바꿈(LF/CRLF)**: 이 PC는 `core.autocrlf=true`라서 `git add` 때 "LF will be replaced by CRLF" 경고가 나옴. 동작에는 문제 없음. 다른 OS에서도 작업한다면 `.gitattributes`로 통일하는 것을 고려.
 4. **anon key는 저장소에서 빠졌어도 앱 안에는 들어 있음**: 배포된 앱을 분석하면 Supabase URL/anon key를 꺼낼 수 있음 (Supabase 구조상 정상). 실제 데이터 보호는 **RLS 정책**에 달려 있으므로 6번 RLS 허점을 먼저 막아야 함. `service_role` 키는 절대 앱·저장소에 넣지 말 것.
-5. **타입 에러**: `npx tsc --noEmit` 실패 — `StyleSheet.absoluteFillObject` 미존재(RN 0.86 타입, `chat.tsx`, `event/[id].tsx`, `profile-edit.tsx`, `CalendarScreen.tsx`, `MapScreen.tsx`), `TextInput`의 `includeFontPadding` prop(`chat.tsx`), `MediaPlayerScreen.tsx`의 암시적 `any`.
+5. **타입 에러** (실행에는 영향 없음, SDK 58 기준): `npx tsc --noEmit` 실패 — 탭 아이콘 `color` 타입(`app/(tabs)/_layout.tsx`), 리스트 헤더/푸터에 `Element | null` 전달(`chat.tsx`, `event/[id].tsx`), `useRef<ScrollView>` / `useRef<View>` ref 타입 변경으로 `scrollTo`·`measureInWindow` 타입 에러(`event/[id].tsx`, `MapScreen.tsx`), `react-native`에서 `ViewToken` 타입 export 사라짐(`MediaPlayerScreen.tsx`, `ReelViewerScreen.tsx`), `TextInput`의 `includeFontPadding` prop(`chat.tsx`), `MediaPlayerScreen.tsx`의 암시적 `any`.
 6. **RLS 허점 (보안)**:
    - `couples_select`/`couples_update`가 `status = 'pending'`인 모든 커플을 누구나 조회·수정 가능
    - 별칭 "본인은 수정 불가" 규칙은 클라이언트에서만 지켜짐 (DB 정책상 커플 멤버는 두 컬럼 모두 수정 가능)
@@ -295,7 +299,9 @@ eas submit --platform ios   # 확인 필요: 실제 사용 여부
 11. **`002b_messages_read_at.sql`**: 최신 `002`와 함께 실행하면 `messages_update_read` 정책이 중복되어 에러.
 12. **원격 저장소**: GitHub `MinHyun-code/couple-app` (public) — https://github.com/MinHyun-code/couple-app , 기본 브랜치 `main`, 2026-11-01 첫 푸시. 소스·DB 스키마가 공개돼 있으므로 RLS 허점(6번)이 더 쉽게 드러남. GitHub CLI는 `C:\Program Files\GitHub CLI\gh.exe`에 설치됨 (기존에 열려 있던 터미널에서는 PATH에 없을 수 있음).
 13. **Jalnan2 폰트는 저장소에 없음**: 공개 저장소·git 이력에서 제거함 (Pretendard·D2Coding은 SIL OFL이라 그대로 둠). clone한 환경·EAS 클라우드 빌드에서는 이 파일이 없으므로, 클라우드 빌드 전에 대책 필요 (다음에 할 일 참고). 이력 정리 때문에 2026-11-01에 `main`을 한 번 강제 푸시함. 예전 커밋(`9a7043e`)은 SHA로 직접 조회하면 GitHub 캐시에 아직 남아 있음(폰트만 포함, 키 없음) — 완전히 지우려면 저장소 삭제 후 재생성.
-14. **SDK 57 고정**: 아이폰 Expo Go는 SDK 58만 지원하므로 Expo Go 사용 불가. 개발용 앱(development build)으로만 실행. SDK 58 업그레이드는 패키지 변경이 커서 보류.
+14. **Expo Go SDK 따라가기**: 아이폰 Expo Go가 SDK 59로 올라가면 다시 같은 오류가 남 → 그때마다 SDK 업그레이드 필요.
+15. **앱 아이콘이 정사각형이 아님**: `src/assets/icon.png`, `src/assets/adaptive-icon.png`가 852x1846이라 `npx expo-doctor`에서 경고. 스토어 제출 전 1024x1024 정사각형으로 교체 필요.
+16. **`npm audit` 취약점 경고**: 설치 시 29건(critical 1) 보고됨. 대부분 개발 도구 의존성으로 추정, `npm audit fix --force`는 Expo 버전을 깨뜨릴 수 있어 실행하지 않음 (확인 필요).
 
 ### 다음에 할 일 (우선순위 순)
 1. EAS 클라우드 빌드 전에 `SUPABASE_URL`, `SUPABASE_ANON_KEY`를 EAS 환경 변수로 등록 (4-2 참고) — 안 하면 빌드된 앱이 Supabase에 연결되지 않음
@@ -303,7 +309,7 @@ eas submit --platform ios   # 확인 필요: 실제 사용 여부
 2. RLS 보강 (pending 커플 조회는 초대 코드 RPC로 대체, event_media insert 시 커플 확인 등) — 저장소가 public이 되어 우선순위 올림
 3. 운영 DB에서 `009` 실행 여부와 기존 컬럼 정의 확인 (Supabase Table Editor에서 `calendar_events` 컬럼 확인)
 4. Storage 버킷/정책을 SQL로 문서화
-5. `npx tsc --noEmit` 에러 정리 (`absoluteFillObject` → `absoluteFill` 등)
+5. `npx tsc --noEmit` 에러 정리 (7번 알려진 문제 5 참고 — 전부 타입 선언 문제)
 6. iOS/Android 위젯 실기기 동작 확인
 7. 캐릭터·일정별 영상 공유 기능: 살릴지 제거할지 결정 후 정리, 미사용 패키지 제거
 8. (선택) 푸시 전송을 Supabase Edge Function/DB 트리거로 이전, 설정 값을 `app.config.js` + env로 이전
