@@ -189,7 +189,8 @@ npx expo install --fix      # Expo SDK와 패키지 버전 맞추기
 npx expo start              # = npm start
 ```
 - **제목 폰트 `Jalnan2`(여기어때 잘난체)는 저장소에 포함하지 않음** (재배포 라이선스 문제로 `.gitignore` 처리). 새로 clone했다면 여기어때 공식 배포처에서 잘난체2 TTF를 받아 정확히 `assets/fonts/Jalnan2TTF.ttf` 이름으로 넣어야 함. 파일이 없으면 `app/_layout.tsx`의 `require`가 실패해 번들링이 안 됨.
-- 위젯(`@bacons/apple-targets`, `react-native-android-widget`)과 `expo-dev-client`가 들어 있어 **Expo Go로는 전체 기능이 동작하지 않음** → development build 필요:
+- **평소 실행은 `npx expo start --dev-client`** 후 아이폰 기본 카메라로 QR을 찍거나, 폰에 설치된 개발용 "우리의 날" 앱에서 서버 선택. **Expo Go 앱으로는 열 수 없음** — 아이폰 Expo Go는 최신 SDK(58)만 지원하고 이 프로젝트는 SDK 57이라 "Either upgrade this project to SDK 58.0.0…" 오류가 남.
+- 위젯(`@bacons/apple-targets`, `react-native-android-widget`)과 `expo-dev-client`가 들어 있어 **Expo Go로는 전체 기능이 동작하지 않음** → development build 필요 (네이티브 패키지가 바뀌었을 때도 다시 빌드):
 ```bash
 npm install -g eas-cli
 eas login
@@ -237,7 +238,8 @@ eas submit --platform ios   # 확인 필요: 실제 사용 여부
 | 17 | `.gitignore` 보강 + 누락 컬럼 마이그레이션 | `.gitignore`에 `node_modules/`, `dist/`, `.env`, `.env*.local`, `.claude/settings.local.json` 추가 / `009_calendar_recurring_icon_idea.sql` 작성 |
 | 18 | 기본 브랜치 정하기 → 첫 커밋 → 원격 연결 | `master` → `main`으로 변경, 첫 커밋 완료. GitHub CLI 설치·로그인 |
 | 19 | 저장소를 public으로, 중요한 값은 올리지 않기 | Supabase URL/anon key를 `app.json` → `.env` + `app.config.js`로 이동, `.env.example` 추가. 푸시 전이라 첫 커밋을 고쳐 써서 git 이력에도 남지 않게 함 → public 저장소 `MinHyun-code/couple-app` 생성·푸시, 원격 `app.json`에 키 없음 확인 |
-| 20 | 여기어때 잘난체(Jalnan2) 폰트는 저장소에서 빼기 | git 이력 전체에서 폰트 파일 제거 후 강제 푸시, `.gitignore`에 추가. 로컬 파일은 유지 |
+| 20 | 여기어때 잘난체(Jalnan2) 폰트는 저장소에서 빼기 | git 이력 전체에서 폰트 파일 제거 후 강제 푸시(사용자가 직접 실행), `.gitignore`에 추가. 로컬 파일은 유지 |
+| 21 | `expo start` 시 Expo Go "SDK 58로 업그레이드" 오류 | 업그레이드 대신 기존 개발용 앱으로 `npx expo start --dev-client` 실행하기로 함 |
 
 ---
 
@@ -292,7 +294,8 @@ eas submit --platform ios   # 확인 필요: 실제 사용 여부
 10. **진입 불가 화면**: `CharacterScreen`(탭 숨김), `MediaPlayerScreen`(라우트는 있으나 이동 코드 없음). 캐릭터 아이템 이미지(`items/*.png`)도 없음.
 11. **`002b_messages_read_at.sql`**: 최신 `002`와 함께 실행하면 `messages_update_read` 정책이 중복되어 에러.
 12. **원격 저장소**: GitHub `MinHyun-code/couple-app` (public) — https://github.com/MinHyun-code/couple-app , 기본 브랜치 `main`, 2026-11-01 첫 푸시. 소스·DB 스키마가 공개돼 있으므로 RLS 허점(6번)이 더 쉽게 드러남. GitHub CLI는 `C:\Program Files\GitHub CLI\gh.exe`에 설치됨 (기존에 열려 있던 터미널에서는 PATH에 없을 수 있음).
-13. **Jalnan2 폰트는 저장소에 없음**: 공개 저장소·git 이력에서 제거함 (Pretendard·D2Coding은 SIL OFL이라 그대로 둠). clone한 환경·EAS 클라우드 빌드에서는 이 파일이 없으므로, 클라우드 빌드 전에 대책 필요 (다음에 할 일 참고). 이력 정리 때문에 2026-11-01에 `main`을 한 번 강제 푸시함.
+13. **Jalnan2 폰트는 저장소에 없음**: 공개 저장소·git 이력에서 제거함 (Pretendard·D2Coding은 SIL OFL이라 그대로 둠). clone한 환경·EAS 클라우드 빌드에서는 이 파일이 없으므로, 클라우드 빌드 전에 대책 필요 (다음에 할 일 참고). 이력 정리 때문에 2026-11-01에 `main`을 한 번 강제 푸시함. 예전 커밋(`9a7043e`)은 SHA로 직접 조회하면 GitHub 캐시에 아직 남아 있음(폰트만 포함, 키 없음) — 완전히 지우려면 저장소 삭제 후 재생성.
+14. **SDK 57 고정**: 아이폰 Expo Go는 SDK 58만 지원하므로 Expo Go 사용 불가. 개발용 앱(development build)으로만 실행. SDK 58 업그레이드는 패키지 변경이 커서 보류.
 
 ### 다음에 할 일 (우선순위 순)
 1. EAS 클라우드 빌드 전에 `SUPABASE_URL`, `SUPABASE_ANON_KEY`를 EAS 환경 변수로 등록 (4-2 참고) — 안 하면 빌드된 앱이 Supabase에 연결되지 않음
