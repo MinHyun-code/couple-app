@@ -196,9 +196,14 @@ npx expo start --go         # 아이폰 Expo Go로 실행 (평소 방식)
 ```bash
 npm install -g eas-cli
 eas login
-eas build --profile development --platform ios       # 또는 android
-npx expo start --dev-client
+eas device:create                                    # 처음 한 번: 아이폰 Safari로 링크 열어 프로필 설치
+eas build --profile development --platform ios       # 15~30분, Apple ID 로그인 → 인증서는 EAS 자동 관리
+# 빌드 완료 후 나오는 링크/QR을 아이폰으로 열어 설치
+npx expo start --dev-client                          # 개발용 앱에서 PC 서버 선택 (Expo Go는 --go)
 ```
+- 설치한 앱이 안 열리면 아이폰 **설정 → 개인정보 보호 및 보안 → 개발자 모드** 켜고 재부팅.
+- 잠금화면 위젯 확인: 잠금화면 길게 누르기 → 사용자화 → 잠금화면 → 위젯에서 "함께한 날" 추가 (앱을 한 번 열어야 날짜가 채워짐).
+- 첫 빌드에서 위젯 App Group 권한이나 비정사각형 아이콘 때문에 실패할 수 있음 (확인 필요).
 
 ### 4-4. 빌드 / 배포
 ```bash
